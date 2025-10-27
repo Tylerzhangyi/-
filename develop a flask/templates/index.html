@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人简历</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="photo">
+                <img src="{{ profile.photo_url }}" alt="个人照片" style="max-width: 200px; max-height: 230px; object-fit: contain;">
+            </div>
+            <div class="personal-info">
+                <h1>{{ profile.name }}</h1>
+                <p><strong>年龄：</strong>{{ profile.age }}</p>
+                <p><strong>爱好：</strong>{{ profile.hobby }}</p>
+                <p><strong>职业：</strong>{{ profile.profession }}</p>
+                <p><strong>绰号：</strong>{{ profile.nickname }}</p>
+                <p><strong>位置：</strong>{{ profile.position }}</p>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>个人简介</h2>
+                <div class="brief">
+                    {{ profile.brief }}
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>职业生涯</h2>
+                {% for experience in profile.experiences %}
+                <div class="experience-item">
+                    <h3>{{ experience.title }}</h3>
+                    <p class="year">{{ experience.period }}</p>
+                    <p>{{ experience.description }}</p>
+                    <p>{{ experience.details }}</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="section">
+                <h2>技能专长</h2>
+                <div class="skills-grid">
+                    {% for skill in profile.skills %}
+                    <div class="skill-item">
+                        <div class="skill-name">{{ skill.name }}</div>
+                        <div class="skill-level">{{ skill.score }}/100 ({{ skill.level }})</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
