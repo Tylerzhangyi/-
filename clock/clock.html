@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang=zh-CN>
+<head>
+  <meta charset=utf-8>
+  <meta name=viewport content="width=device-width,initial-scale=1">
+  <title>Clock</title>
+  <style>
+    body {
+      display: grid;
+      place-items: center;
+      height: 100vh;
+      margin: 0;
+      font: 700 20vmin/1 system-ui;
+    }
+  </style>
+  </head>
+<body>
+  <div id=t></div>
+  <script>
+    function tick() {
+      const now = Date.now();
+      const delay = 1000 - (now % 1000);
+      t.textContent = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+      setTimeout(tick, delay);
+    }
+    tick();
+  </script>
+  </body>
+</html>
+
