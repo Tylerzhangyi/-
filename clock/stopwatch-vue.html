@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang=zh-CN>
+<head>
+  <meta charset=utf-8>
+  <meta name=viewport content="width=device-width,initial-scale=1">
+  <title>Stopwatch (Vue)</title>
+  <style>
+    body {
+      display: grid;
+      place-items: center;
+      height: 100vh;
+      margin: 0;
+      font: 700 20vmin/1 system-ui;
+      gap: 1rem;
+    }
+    #display {
+      font-size: 15vmin;
+      font-family: monospace;
+      letter-spacing: 0.05em;
+    }
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #333;
+      cursor: pointer;
+      background: white;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    ul {
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 1rem;
+      margin-top: 1rem;
+      list-style: none;
+      padding: 0;
+    }
+    ul li {
+      padding: 0.25rem 0;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <div id=app>
+    <div id=display>{{ displayTime }}</div>
+    <div class=controls>
+      <button @click=start :disabled=isRunning>开始</button>
+      <button @click=pause :disabled=!isRunning>暂停</button>
+      <button @click=lap :disabled=!isRunning>记圈</button>
+      <button @click=reset>重置</button>
+    </div>
+    <ul>
+      <li v-for="lap in laps" :key="lap.id">{{ formatTime(lap.totalTime) }}</li>
+    </ul>
+  </div>
+  <script src="https://unpkg.com/vue@3"></script>
+  <script>
+    const { createApp } = Vue;
+    createApp({
+      data() {
+        return {
+          startTime: 0,
+          elapsed: 0,
+          timerId: null,
+          isRunning: false,
+          laps: [],
+          lastLapTime: 0,
+          lapId: 0
+        };
+      },
+      computed: {
+        displayTime() {
+          return this.formatTime(this.elapsed);
+        }
+      },
+      methods: {
+        formatTime(ms) {
+          const totalSeconds = Math.floor(ms / 1000);
+          const hours = Math.floor(totalSeconds / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+          const milliseconds = ms % 1000;
+          return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+        },
+        update() {
+          const now = Date.now();
+          this.elapsed = now - this.startTime;
+          this.timerId = requestAnimationFrame(() => this.update());
+        },
+        start() {
+          if (!this.isRunning) {
+            this.startTime = Date.now() - this.elapsed;
+            this.isRunning = true;
+            this.update();
+          }
+        },
+        pause() {
+          if (this.isRunning) {
+            cancelAnimationFrame(this.timerId);
+            this.isRunning = false;
+          }
+        },
+        lap() {
+          if (this.isRunning) {
+            const currentTime = Date.now() - this.startTime;
+            const lapTime = currentTime - this.lastLapTime;
+            this.laps.push({ id: this.lapId++, lapTime, totalTime: currentTime });
+            this.lastLapTime = currentTime;
+          }
+        },
+        reset() {
+          cancelAnimationFrame(this.timerId);
+          this.isRunning = false;
+          this.elapsed = 0;
+          this.startTime = 0;
+          this.lastLapTime = 0;
+          this.laps = [];
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
+
